@@ -763,26 +763,19 @@
                                 </select>
                             </div>
                             
-                            <div class="flex flex-wrap gap-2 justify-center">
+                            <div id="category-buttons" class="flex flex-wrap gap-2 justify-center">
                                 ${renderCategoryButton('all', 'Alles', state.selectedCategory === 'all')}
                                 ${categories.map(cat => renderCategoryButton(cat, cat, state.selectedCategory === cat)).join('')}
                             </div>
                         </div>
                         
-                        <div class="text-neutral-400 mb-6 text-center">
+                        <div id="product-count" class="text-neutral-400 mb-6 text-center">
                             ${products.length} ${products.length === 1 ? 'item' : 'items'} gevonden
                         </div>
-                        
-                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+
+                        <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                             ${products.map(p => renderProductCard(p)).join('')}
                         </div>
-                        
-                        ${products.length === 0 ? `
-                            <div class="text-center py-16">
-                                <div class="text-6xl mb-4">🏋️</div>
-                                <p class="text-neutral-400 text-lg">Geen items gevonden.</p>
-                            </div>
-                        ` : ''}
                     </div>
                 </section>
                 
@@ -868,20 +861,49 @@
             updateCartButton();
         }
 
+        // Update only the product grid (not the whole page)
+        function updateProductGrid() {
+            const products = getFilteredProducts();
+            const categories = getCategories();
+            const productGrid = document.getElementById('product-grid');
+            const productCount = document.getElementById('product-count');
+            const categoryButtons = document.getElementById('category-buttons');
+
+            if (productGrid) {
+                if (products.length === 0) {
+                    productGrid.innerHTML = `
+                        <div class="col-span-full text-center py-16">
+                            <div class="text-6xl mb-4">🏋️</div>
+                            <p class="text-neutral-400 text-lg">Geen items gevonden.</p>
+                        </div>
+                    `;
+                } else {
+                    productGrid.innerHTML = products.map(p => renderProductCard(p)).join('');
+                }
+            }
+            if (productCount) {
+                productCount.textContent = `${products.length} ${products.length === 1 ? 'item' : 'items'} gevonden`;
+            }
+            if (categoryButtons) {
+                categoryButtons.innerHTML = renderCategoryButton('all', 'Alles', state.selectedCategory === 'all') +
+                    categories.map(cat => renderCategoryButton(cat, cat, state.selectedCategory === cat)).join('');
+            }
+        }
+
         // Event handlers
         function setCategory(category) {
             state.selectedCategory = category;
-            render();
+            updateProductGrid();
         }
 
         function setSearch(query) {
             state.searchQuery = query;
-            render();
+            updateProductGrid();
         }
 
         function setSort(sortBy) {
             state.sortBy = sortBy;
-            render();
+            updateProductGrid();
         }
 
         // Make functions globally available

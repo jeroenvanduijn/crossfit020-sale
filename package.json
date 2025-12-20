@@ -1,0 +1,12 @@
+{
+  "name": "crossfit-020-uitverkoop",
+  "version": "1.0.0",
+  "description": "CrossFit 020 Gym Uitverkoop - Verkoopwebsite met Google Sheets integratie",
+  "scripts": {
+    "dev": "npx serve .",
+    "start": "npx serve ."
+  },
+  "keywords": ["crossfit", "uitverkoop", "fitness"],
+  "author": "CrossFit 020",
+  "license": "MIT"
+}

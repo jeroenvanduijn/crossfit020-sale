@@ -300,6 +300,7 @@
             'https://wsjkvdlhvghczk5v.public.blob.vercel-storage.com/pictures/hero-background-139.jpg',
             'https://wsjkvdlhvghczk5v.public.blob.vercel-storage.com/pictures/hero-background-140.jpg',
             'https://wsjkvdlhvghczk5v.public.blob.vercel-storage.com/pictures/hero-background-141.jpg',
+            'https://wsjkvdlhvghczk5v.public.blob.vercel-storage.com/pictures/hero-background-142.jpg',
         ];
         let currentImageIndex = 0;
 
@@ -795,9 +796,9 @@
                                 <a href="#catalog" class="inline-block bg-brand-orange hover:bg-orange-600 text-white font-bold py-4 px-8 rounded-full text-lg transition-all hover:scale-105">
                                     Bekijk Aanbod ↓
                                 </a>
-                                <button onclick="loadInventory()" class="inline-block bg-neutral-800 hover:bg-neutral-700 text-white font-bold py-4 px-8 rounded-full text-lg transition-all">
-                                    🔄 Ververs voorraad
-                                </button>
+                                <a href="#photos" class="inline-block bg-neutral-800 hover:bg-neutral-700 text-white font-bold py-4 px-8 rounded-full text-lg transition-all hover:scale-105">
+                                    Bekijk Foto's ↓
+                                </a>
                             </div>
                         </div>
                     </div>
@@ -843,7 +844,7 @@
                 </section>
                 
                 <!-- Photo Gallery -->
-                <section class="py-16 md:py-24 bg-neutral-900">
+                <section id="photos" class="py-16 md:py-24 bg-neutral-900">
                     <div class="container mx-auto px-4">
                         <div class="text-center mb-12">
                             <h2 class="text-3xl md:text-4xl font-black mb-4">Bekijk de Gym</h2>
@@ -886,6 +887,9 @@
                             </div>
                             <div onclick="openLightbox(11)" class="aspect-video bg-neutral-800 rounded-xl overflow-hidden relative group cursor-pointer">
                                 <img src="https://wsjkvdlhvghczk5v.public.blob.vercel-storage.com/pictures/hero-background-141.jpg" alt="Gym foto 12" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                            </div>
+                            <div onclick="openLightbox(12)" class="aspect-video bg-neutral-800 rounded-xl overflow-hidden relative group cursor-pointer">
+                                <img src="https://wsjkvdlhvghczk5v.public.blob.vercel-storage.com/pictures/hero-background-142.jpg" alt="Gym foto 13" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
                             </div>
                         </div>
 

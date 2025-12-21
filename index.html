@@ -51,8 +51,8 @@
     </div>
 
     <!-- Cart Sidebar -->
-    <div id="cart-sidebar" class="fixed inset-y-0 right-0 w-full md:w-[450px] bg-neutral-900 shadow-2xl transform translate-x-full transition-transform duration-300 z-50 flex flex-col">
-        <div id="cart-content"></div>
+    <div id="cart-sidebar" class="fixed inset-y-0 right-0 w-full md:w-[450px] bg-neutral-900 shadow-2xl transform translate-x-full transition-transform duration-300 z-50 flex flex-col overflow-hidden">
+        <div id="cart-content" class="h-full flex flex-col overflow-hidden"></div>
     </div>
     
     <!-- Overlay -->
@@ -282,6 +282,7 @@
         function openCart() {
             document.getElementById('cart-sidebar').classList.remove('translate-x-full');
             document.getElementById('overlay').classList.remove('opacity-0', 'pointer-events-none');
+            document.body.style.overflow = 'hidden';
             renderCart();
         }
 
@@ -289,6 +290,7 @@
             state.checkoutStep = 'cart';
             document.getElementById('cart-sidebar').classList.add('translate-x-full');
             document.getElementById('overlay').classList.add('opacity-0', 'pointer-events-none');
+            document.body.style.overflow = '';
         }
 
         function updateCartButton() {

@@ -740,6 +740,8 @@
             const categories = getCategories();
             const totalItems = state.inventory.reduce((sum, p) => sum + p.quantity, 0);
             const totalValue = state.inventory.reduce((sum, p) => sum + (p.quantity * p.price), 0);
+            const originalItems = state.inventory.reduce((sum, p) => sum + (p.originalQuantity || p.quantity), 0);
+            const originalValue = state.inventory.reduce((sum, p) => sum + ((p.originalQuantity || p.quantity) * p.price), 0);
 
             document.getElementById('app').innerHTML = `
                 <!-- Hero Section -->
@@ -786,18 +788,20 @@
                                 <div id="countdown">${renderCountdown()}</div>
                             </div>
                             
-                            <div class="flex justify-center gap-8 md:gap-16">
+                            <div class="flex justify-center gap-6 md:gap-12">
                                 <div class="text-center">
                                     <div class="text-3xl md:text-4xl font-black text-white">${totalItems}</div>
                                     <div class="text-neutral-400 text-sm">Items over</div>
+                                    <div class="text-neutral-500 text-xs mt-1">van ${originalItems}</div>
                                 </div>
                                 <div class="text-center">
-                                    <div class="text-3xl md:text-4xl font-black text-white">${categories.length}</div>
-                                    <div class="text-neutral-400 text-sm">Categorieën</div>
+                                    <div class="text-3xl md:text-4xl font-black text-brand-orange">${originalItems - totalItems}</div>
+                                    <div class="text-neutral-400 text-sm">Gereserveerd</div>
                                 </div>
                                 <div class="text-center">
-                                    <div class="text-3xl md:text-4xl font-black text-brand-orange">€${Math.round(totalValue / 1000)}k</div>
-                                    <div class="text-neutral-400 text-sm">Totale waarde</div>
+                                    <div class="text-3xl md:text-4xl font-black text-white">€${Math.round(totalValue / 1000)}k</div>
+                                    <div class="text-neutral-400 text-sm">Waarde over</div>
+                                    <div class="text-neutral-500 text-xs mt-1">van €${Math.round(originalValue / 1000)}k</div>
                                 </div>
                             </div>
                             

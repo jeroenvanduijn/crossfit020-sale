@@ -27,7 +27,7 @@
         }
     </script>
     <style>
-        .gradient-bg { background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%); }
+        .gradient-bg { background: linear-gradient(135deg, #1c1917 0%, #292524 100%); }
         .card-hover:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(255, 107, 53, 0.15); }
         .pulse-badge { animation: pulse 2s infinite; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
@@ -772,71 +772,84 @@
             document.getElementById('app').innerHTML = `
                 <!-- Hero Section -->
                 <section class="gradient-bg min-h-screen flex flex-col justify-center relative overflow-hidden">
-                    <div class="absolute inset-0 opacity-5">
+                    <div class="absolute inset-0 opacity-10">
                         <div class="absolute top-20 left-10 w-72 h-72 bg-brand-orange rounded-full blur-3xl"></div>
                         <div class="absolute bottom-20 right-10 w-96 h-96 bg-brand-orange rounded-full blur-3xl"></div>
                     </div>
-                    
+
                     <div class="container mx-auto px-4 py-16 relative z-10">
                         <div class="text-center max-w-4xl mx-auto">
                             <div class="inline-block mb-6">
-                                <span class="bg-red-500/20 text-red-400 px-4 py-2 rounded-full text-sm font-bold uppercase tracking-wider border border-red-500/30">
-                                    ⚡ Gym Sluit Definitief
+                                <span class="bg-brand-orange/20 text-brand-orange px-4 py-2 rounded-full text-sm font-medium border border-brand-orange/30">
+                                    Dank voor alles
                                 </span>
                             </div>
-                            
+
                             <h1 class="text-5xl md:text-7xl font-black mb-4 leading-tight">
                                 CrossFit <span class="text-brand-orange">020</span>
                             </h1>
-                            <h2 class="text-3xl md:text-5xl font-black text-neutral-400 mb-6">
-                                Gym Uitverkoop
+                            <h2 class="text-2xl md:text-4xl font-bold text-neutral-300 mb-6">
+                                Afscheid en materiaalovername
                             </h2>
-                            
-                            <p class="text-xl md:text-2xl text-neutral-300 mb-8 font-medium">
-                                Alles moet weg! Professionele fitnessapparatuur voor scherpe prijzen.
+
+                            <p class="text-lg md:text-xl text-neutral-400 mb-3">
+                                Apparatuur die jarenlang onderdeel was van onze community, krijgt nu een nieuw thuis.
                             </p>
-                            
-                            <div class="bg-brand-orange/20 border-2 border-brand-orange rounded-2xl p-6 mb-10">
-                                <div class="text-brand-orange font-black text-xl md:text-2xl uppercase tracking-wide mb-4">
-                                    📦 Ophaalmomenten
-                                </div>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-left max-w-md mx-auto text-sm md:text-base">
-                                    <div class="text-neutral-300">Zo 28 dec</div><div class="text-white font-semibold">13:00 - 17:00</div>
-                                    <div class="text-neutral-300">Ma 29 dec</div><div class="text-white font-semibold">10:00 - 11:00, 13:00 - 17:00</div>
-                                    <div class="text-neutral-300">Di 30 dec</div><div class="text-white font-semibold">13:00 - 21:00</div>
-                                    <div class="text-neutral-300">Wo 31 dec</div><div class="text-white font-semibold">09:00 - 14:00</div>
-                                </div>
-                                <div class="text-neutral-400 mt-4 text-sm">📍 Hoogoorddreef 3, Amsterdam Zuidoost</div>
+                            <p class="text-sm text-neutral-500 mb-10">
+                                Om alles netjes en op tijd af te ronden, werken we met vaste ophaalmomenten en reserveringen.
+                            </p>
+
+                            <!-- Afscheids WOD -->
+                            <div class="bg-neutral-800/50 border border-neutral-700 rounded-2xl p-6 mb-10 max-w-lg mx-auto">
+                                <h3 class="text-brand-orange font-bold text-lg mb-2">Een laatste keer samen</h3>
+                                <p class="text-neutral-300 text-sm mb-3">
+                                    Kom je ook naar de afscheidsWOD? Zondag 28 dec om 10:00. Neem gerust wat te drinken of eten mee. Iedereen is welkom, ook oud-leden.
+                                </p>
                             </div>
-                            
+
+                            <div class="bg-brand-orange/15 border border-brand-orange/40 rounded-2xl p-6 mb-10">
+                                <div class="text-brand-orange font-bold text-lg md:text-xl mb-2">
+                                    Ophaalmomenten
+                                </div>
+                                <p class="text-neutral-500 text-xs mb-4">Dankjewel dat je helpt dit netjes af te ronden.</p>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-left max-w-md mx-auto text-sm md:text-base">
+                                    <div class="text-neutral-400">Zo 28 dec</div><div class="text-white font-medium">13:00 - 17:00</div>
+                                    <div class="text-neutral-400">Ma 29 dec</div><div class="text-white font-medium">10:00 - 11:00, 13:00 - 17:00</div>
+                                    <div class="text-neutral-400">Di 30 dec</div><div class="text-white font-medium">13:00 - 21:00</div>
+                                    <div class="text-neutral-400">Wo 31 dec</div><div class="text-white font-medium">09:00 - 14:00</div>
+                                </div>
+                                <div class="text-neutral-500 mt-4 text-sm">Hoogoorddreef 3, Amsterdam Zuidoost</div>
+                            </div>
+
                             <div class="mb-10">
-                                <p class="text-neutral-400 mb-4 text-sm uppercase tracking-wider font-semibold">Eerste ophaalmoment over:</p>
+                                <p class="text-neutral-500 mb-4 text-sm font-medium">Eerste ophaalmoment start over:</p>
                                 <div id="countdown">${renderCountdown()}</div>
                             </div>
-                            
-                            <div class="flex justify-center gap-6 md:gap-12">
+
+                            <div class="flex justify-center gap-6 md:gap-10">
                                 <div class="text-center">
                                     <div class="text-3xl md:text-4xl font-black text-white">${totalItems}</div>
-                                    <div class="text-neutral-400 text-sm">Items over</div>
-                                    <div class="text-neutral-500 text-xs mt-1">van ${originalItems}</div>
+                                    <div class="text-neutral-400 text-sm">Items beschikbaar</div>
+                                    <div class="text-neutral-600 text-xs mt-1">Uit onze box</div>
                                 </div>
                                 <div class="text-center">
                                     <div class="text-3xl md:text-4xl font-black text-brand-orange">${originalItems - totalItems}</div>
-                                    <div class="text-neutral-400 text-sm">Gereserveerd</div>
+                                    <div class="text-neutral-400 text-sm">Al gereserveerd</div>
+                                    <div class="text-neutral-600 text-xs mt-1">Hebben al een nieuwe plek</div>
                                 </div>
                                 <div class="text-center">
-                                    <div class="text-3xl md:text-4xl font-black text-white">€${Math.round(totalValue / 1000)}k</div>
-                                    <div class="text-neutral-400 text-sm">Waarde over</div>
-                                    <div class="text-neutral-500 text-xs mt-1">van €${Math.round(originalValue / 1000)}k</div>
+                                    <div class="text-3xl md:text-4xl font-black text-white">€${Math.round(originalValue / 1000)}k</div>
+                                    <div class="text-neutral-400 text-sm">Totale waarde</div>
+                                    <div class="text-neutral-600 text-xs mt-1">Ter indicatie</div>
                                 </div>
                             </div>
-                            
+
                             <div class="mt-12 flex flex-col md:flex-row gap-4 justify-center">
                                 <a href="#catalog" class="inline-block bg-brand-orange hover:bg-orange-600 text-white font-bold py-4 px-8 rounded-full text-lg transition-all hover:scale-105">
-                                    Bekijk Aanbod ↓
+                                    Bekijk het aanbod
                                 </a>
                                 <a href="#photos" class="inline-block bg-neutral-800 hover:bg-neutral-700 text-white font-bold py-4 px-8 rounded-full text-lg transition-all hover:scale-105">
-                                    Bekijk Foto's ↓
+                                    Bekijk foto's uit de box
                                 </a>
                             </div>
                         </div>
@@ -847,8 +860,8 @@
                 <section id="catalog" class="py-16 md:py-24 bg-neutral-950">
                     <div class="container mx-auto px-4">
                         <div class="text-center mb-12">
-                            <h2 class="text-4xl md:text-5xl font-black mb-4">Productcatalogus</h2>
-                            <p class="text-neutral-400 text-lg">Live voorraad uit Google Sheets • Klik op + om toe te voegen</p>
+                            <h2 class="text-2xl md:text-3xl font-bold mb-4">Beschikbaar materiaal</h2>
+                            <p class="text-neutral-400">De voorraad wordt live bijgewerkt. Klik op + om te reserveren.</p>
                         </div>
                         
                         <div class="mb-8 space-y-4">
@@ -886,8 +899,8 @@
                 <section id="photos" class="py-16 md:py-24 bg-neutral-900">
                     <div class="container mx-auto px-4">
                         <div class="text-center mb-12">
-                            <h2 class="text-3xl md:text-4xl font-black mb-4">Bekijk de Gym</h2>
-                            <p class="text-neutral-400 text-lg">Foto's van het materiaal in onze gym</p>
+                            <h2 class="text-2xl md:text-3xl font-bold mb-4">Foto's uit de box</h2>
+                            <p class="text-neutral-400">Een kijkje in onze ruimte en het materiaal</p>
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-6xl mx-auto">
@@ -932,62 +945,62 @@
                             </div>
                         </div>
 
-                        <p class="text-center text-neutral-500 mt-6 text-sm">Alle apparatuur is tweedehands maar in goede staat</p>
+                        <p class="text-center text-neutral-500 mt-6 text-sm">Alle apparatuur is gebruikt maar in goede staat</p>
                     </div>
                 </section>
 
                 <!-- How it Works -->
                 <section class="py-16 md:py-24 bg-neutral-950">
                     <div class="container mx-auto px-4">
-                        <h2 class="text-3xl md:text-4xl font-black text-center mb-12">Hoe werkt het?</h2>
+                        <h2 class="text-2xl md:text-3xl font-bold text-center mb-12">Hoe werkt het reserveren?</h2>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
                             <div class="text-center">
-                                <div class="w-16 h-16 bg-brand-orange/20 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">1</div>
-                                <h3 class="font-bold text-xl mb-2">Kies je items</h3>
-                                <p class="text-neutral-400">Voeg producten toe aan je winkelwagen. Voorraad is live!</p>
+                                <div class="w-14 h-14 bg-brand-orange/20 rounded-full flex items-center justify-center text-2xl mx-auto mb-4 text-brand-orange font-bold">1</div>
+                                <h3 class="font-bold text-lg mb-2">Kies je items</h3>
+                                <p class="text-neutral-400 text-sm">Bekijk wat beschikbaar is en voeg toe aan je lijst. De voorraad wordt live bijgewerkt.</p>
                             </div>
                             <div class="text-center">
-                                <div class="w-16 h-16 bg-brand-orange/20 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">2</div>
-                                <h3 class="font-bold text-xl mb-2">Ontvang bevestiging</h3>
-                                <p class="text-neutral-400">Je ontvangt een bevestigingsmail met je ophaalmoment.</p>
+                                <div class="w-14 h-14 bg-brand-orange/20 rounded-full flex items-center justify-center text-2xl mx-auto mb-4 text-brand-orange font-bold">2</div>
+                                <h3 class="font-bold text-lg mb-2">Ontvang bevestiging</h3>
+                                <p class="text-neutral-400 text-sm">Je ontvangt een mail met je ophaalmoment en een overzicht van je reservering.</p>
                             </div>
                             <div class="text-center">
-                                <div class="w-16 h-16 bg-brand-orange/20 rounded-full flex items-center justify-center text-3xl mx-auto mb-4">3</div>
-                                <h3 class="font-bold text-xl mb-2">Ophalen & contant betalen</h3>
-                                <p class="text-neutral-400">Betaal pas in de gym bij ophalen (cash of Tikkie).</p>
+                                <div class="w-14 h-14 bg-brand-orange/20 rounded-full flex items-center justify-center text-2xl mx-auto mb-4 text-brand-orange font-bold">3</div>
+                                <h3 class="font-bold text-lg mb-2">Ophalen en betalen</h3>
+                                <p class="text-neutral-400 text-sm">Kom langs op je gekozen moment. Betalen doe je ter plekke, cash of Tikkie.</p>
                             </div>
                         </div>
 
                         <!-- Extra info boxes -->
                         <div class="mt-12 max-w-2xl mx-auto space-y-4">
-                            <div class="bg-green-500/10 border border-green-500/30 rounded-2xl p-6">
+                            <div class="bg-neutral-800/50 border border-neutral-700 rounded-2xl p-6">
                                 <div class="flex items-start gap-4">
-                                    <div class="text-3xl">💰</div>
+                                    <div class="text-2xl">💳</div>
                                     <div>
-                                        <h4 class="font-bold text-green-400 mb-2">Geen vooruitbetaling nodig!</h4>
-                                        <p class="text-neutral-300 text-sm">Je betaalt pas bij ophalen in de gym. Cash of Tikkie, wat jou het beste uitkomt. Na je bestelling ontvang je een bevestigingsmail met alle details.</p>
+                                        <h4 class="font-bold text-neutral-200 mb-2">Geen vooruitbetaling</h4>
+                                        <p class="text-neutral-400 text-sm">Je betaalt pas bij ophalen in de box. Cash of Tikkie, wat jou het beste uitkomt.</p>
                                     </div>
                                 </div>
                             </div>
-                            <div class="bg-blue-500/10 border border-blue-500/30 rounded-2xl p-6">
+                            <div class="bg-neutral-800/50 border border-neutral-700 rounded-2xl p-6">
                                 <div class="flex items-start gap-4">
-                                    <div class="text-3xl">✓</div>
+                                    <div class="text-2xl">🤝</div>
                                     <div>
-                                        <h4 class="font-bold text-blue-400 mb-2">Vrijblijvend reserveren</h4>
-                                        <p class="text-neutral-300 text-sm">Je zit nergens aan vast. Bij ophalen bekijk je het materiaal en beslis je ter plekke of je het wilt kopen. Niet tevreden? Geen probleem!</p>
+                                        <h4 class="font-bold text-neutral-200 mb-2">Vrijblijvend reserveren</h4>
+                                        <p class="text-neutral-400 text-sm">Bij ophalen bekijk je het materiaal en beslis je ter plekke. Toch niet wat je zoekt? Geen probleem.</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </section>
-                
+
                 <!-- Footer -->
-                <footer class="py-8 bg-neutral-950 border-t border-neutral-800">
-                    <div class="container mx-auto px-4 text-center text-neutral-500 text-sm">
-                        <p>© 2024 CrossFit 020 - Gym Uitverkoop</p>
-                        <p class="mt-2">Alle prijzen zijn per stuk • Ophalen van 27 t/m 31 december</p>
-                        <p class="mt-2">Vragen? <a href="mailto:info@crossfit020.nl" class="text-brand-orange hover:underline">info@crossfit020.nl</a></p>
+                <footer class="py-10 bg-neutral-900/50 border-t border-neutral-800">
+                    <div class="container mx-auto px-4 text-center">
+                        <p class="text-neutral-400 mb-2">Bedankt voor alle mooie jaren.</p>
+                        <p class="text-neutral-500 text-sm">CrossFit 020 - Hoogoorddreef 3, Amsterdam Zuidoost</p>
+                        <p class="mt-4 text-neutral-500 text-sm">Vragen? <a href="mailto:info@crossfit020.nl" class="text-brand-orange hover:underline">info@crossfit020.nl</a></p>
                     </div>
                 </footer>
             `;

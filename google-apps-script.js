@@ -1,7 +1,7 @@
 // ============================================
 // GOOGLE APPS SCRIPT - CrossFit 020 Uitverkoop
 // ============================================
-// 
+//
 // INSTALLATIE:
 // 1. Open je Google Sheet: https://docs.google.com/spreadsheets/d/1io_7NhEUSwB-Gj8KPJ58wUqh_AYhzJZh6nxxUpEGIGU
 // 2. Ga naar: Extensies → Apps Script
@@ -14,10 +14,14 @@
 // 9. Klik "Implementeren" en kopieer de URL
 // 10. Plak de URL in de website (SCRIPT_URL variabele)
 //
+// BELANGRIJK: Kolom "Origineel" bevat de originele voorraad.
+// Beschikbare voorraad = Origineel - alle bestelde aantallen
+// Als je een bestelling verwijdert, gaat de voorraad automatisch omhoog!
+//
 // ============================================
 
 const INVENTORY_SHEET = "Sheet1";  // Naam van je inventaris tabblad
-const ORDERS_SHEET = "Bestellingen";  // Tabblad voor bestellingen (wordt automatisch aangemaakt)
+const ORDERS_SHEET = "Bestellingen";  // Tabblad voor bestellingen
 
 // GET request - Inventaris ophalen
 function doGet(e) {
@@ -25,69 +29,177 @@ function doGet(e) {
     const ss = SpreadsheetApp.getActiveSpreadsheet();
     const sheet = ss.getSheetByName(INVENTORY_SHEET);
     const data = sheet.getDataRange().getValues();
-    
+
     // Headers van je sheet
     const headers = data[0];
-    
+
     // Vind de juiste kolom indices
-    const matCol = headers.indexOf("Materiaal");
-    const weightCol = headers.indexOf("Gewicht");
-    const qtyCol = headers.indexOf("Aantal");
-    const priceCol = headers.indexOf("2de hands prijs");
-    
+    const matCol = findColumn(headers, "Materiaal");
+    const weightCol = findColumn(headers, "Gewicht");
+    const priceCol = findColumn(headers, "2de hands prijs");
+    const origCol = findColumn(headers, "Origineel");
+
+    if (origCol === -1) {
+      return ContentService
+        .createTextOutput(JSON.stringify({
+          success: false,
+          error: "Kolom 'Origineel' niet gevonden. Voeg deze kolom toe aan je sheet."
+        }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // Haal alle bestelde aantallen op per rij
+    const orderedQuantities = getOrderedQuantitiesByRow(ss);
+
     const inventory = [];
-    
+
     for (let i = 1; i < data.length; i++) {
       const row = data[i];
       const materiaal = row[matCol];
       const gewicht = row[weightCol];
-      const aantal = row[qtyCol];
+      const origineel = row[origCol];
       const prijs = row[priceCol];
-      
-      // Skip lege rijen, totaalrijen, en items met 0 voorraad of geen prijs
-      if (!materiaal || 
-          materiaal === "TOTAAL" || 
+
+      // Skip lege rijen, totaalrijen, en items zonder originele voorraad of prijs
+      if (!materiaal ||
+          materiaal === "TOTAAL" ||
           String(materiaal).toLowerCase().includes("totaal") ||
           String(gewicht).toLowerCase() === "totaal" ||
-          aantal === null || 
-          aantal === "" ||
-          isNaN(aantal) ||
-          prijs === null || 
+          origineel === null ||
+          origineel === "" ||
+          isNaN(origineel) ||
+          prijs === null ||
           prijs === "" ||
           isNaN(prijs)) {
         continue;
       }
-      
+
+      const rowIndex = i + 1; // 1-based row number in sheet
+
+      // Bereken beschikbare voorraad: Origineel - besteld
+      const origineelAantal = parseInt(origineel) || 0;
+      const besteldAantal = orderedQuantities[rowIndex] || 0;
+      const beschikbaar = Math.max(0, origineelAantal - besteldAantal);
+
       // Genereer een unieke ID
       const id = generateId(materiaal, gewicht, i);
-      
+
       inventory.push({
         id: id,
-        rowIndex: i + 1, // 1-based row number in sheet
+        rowIndex: rowIndex,
         name: cleanName(materiaal),
         weight: gewicht && gewicht !== "" && !isNaN(gewicht) ? String(gewicht) + "kg" : null,
-        quantity: parseInt(aantal) || 0,
+        quantity: beschikbaar,
+        originalQuantity: origineelAantal,
+        orderedQuantity: besteldAantal,
         price: parseFloat(prijs) || 0,
         category: getCategory(materiaal)
       });
     }
-    
+
     return ContentService
-      .createTextOutput(JSON.stringify({ 
-        success: true, 
+      .createTextOutput(JSON.stringify({
+        success: true,
         inventory: inventory,
         timestamp: new Date().toISOString()
       }))
       .setMimeType(ContentService.MimeType.JSON);
-      
+
   } catch (error) {
     return ContentService
-      .createTextOutput(JSON.stringify({ 
-        success: false, 
-        error: error.message 
+      .createTextOutput(JSON.stringify({
+        success: false,
+        error: error.message
       }))
       .setMimeType(ContentService.MimeType.JSON);
   }
+}
+
+// Haal alle bestelde aantallen op, gegroepeerd per rij-index
+function getOrderedQuantitiesByRow(ss) {
+  const ordersSheet = ss.getSheetByName(ORDERS_SHEET);
+  const quantities = {};
+
+  if (!ordersSheet) {
+    return quantities; // Geen bestellingen sheet = geen bestellingen
+  }
+
+  const ordersData = ordersSheet.getDataRange().getValues();
+
+  // Zoek de "Items" kolom in bestellingen (bevat "2x Dumbell 20kg, 1x Kettlebell 16kg")
+  const ordersHeaders = ordersData[0];
+  let itemsCol = -1;
+  for (let c = 0; c < ordersHeaders.length; c++) {
+    if (String(ordersHeaders[c]).toLowerCase().trim() === "items") {
+      itemsCol = c;
+      break;
+    }
+  }
+
+  if (itemsCol === -1) {
+    // Fallback: kolom J (index 9) is de standaard Items kolom
+    itemsCol = 9;
+  }
+
+  // We hebben ook de rowIndex nodig, die slaan we op in een aparte kolom
+  // Maar die hebben we niet... We moeten de items matchen op naam+gewicht
+
+  // Eerst: haal inventaris data op voor matching
+  const invSheet = ss.getSheetByName(INVENTORY_SHEET);
+  const invData = invSheet.getDataRange().getValues();
+  const invHeaders = invData[0];
+
+  const matCol = findColumn(invHeaders, "Materiaal");
+  const weightCol = findColumn(invHeaders, "Gewicht");
+
+  // Maak een lookup: "naam gewicht" -> rowIndex
+  const itemLookup = {};
+  for (let i = 1; i < invData.length; i++) {
+    const mat = cleanName(String(invData[i][matCol] || "").trim());
+    const weight = invData[i][weightCol];
+    const weightStr = weight && weight !== "" && !isNaN(weight) ? weight + "kg" : "";
+    const key = (mat + " " + weightStr).trim().toLowerCase();
+    itemLookup[key] = i + 1; // rowIndex (1-based)
+
+    // Ook zonder "kg" suffix
+    const key2 = (mat + " " + (weight || "")).trim().toLowerCase();
+    if (key2 !== key) {
+      itemLookup[key2] = i + 1;
+    }
+
+    // Ook alleen naam (voor items zonder gewicht)
+    if (!weightStr) {
+      itemLookup[mat.toLowerCase()] = i + 1;
+    }
+  }
+
+  // Parse alle bestellingen en tel aantallen per item
+  for (let r = 1; r < ordersData.length; r++) {
+    const itemsStr = String(ordersData[r][itemsCol] || "");
+
+    // Parse "2x Dumbell 20kg, 1x Kettlebell 16kg"
+    const items = itemsStr.split(",");
+
+    for (const item of items) {
+      const trimmed = item.trim();
+      if (!trimmed) continue;
+
+      // Match "2x Naam Gewicht" pattern
+      const match = trimmed.match(/^(\d+)x\s+(.+)$/i);
+      if (match) {
+        const qty = parseInt(match[1]);
+        const itemName = match[2].trim().toLowerCase();
+
+        // Zoek rowIndex via lookup
+        const rowIndex = itemLookup[itemName];
+        if (rowIndex) {
+          quantities[rowIndex] = (quantities[rowIndex] || 0) + qty;
+        }
+      }
+    }
+  }
+
+  return quantities;
 }
 
 // POST request - Bestelling plaatsen
@@ -103,34 +215,35 @@ function doPost(e) {
       // Probeer als text/plain
       data = JSON.parse(e.parameter.data || e.postData.contents);
     }
-    
+
     // Maak bestellingen-sheet als die niet bestaat
     let ordersSheet = ss.getSheetByName(ORDERS_SHEET);
     if (!ordersSheet) {
       ordersSheet = ss.insertSheet(ORDERS_SHEET);
       ordersSheet.appendRow([
-        "OrderID", 
-        "Datum", 
+        "OrderID",
+        "Datum",
         "Tijd",
-        "Naam", 
-        "Email", 
-        "Telefoon", 
-        "Ophaalmoment", 
-        "Transport", 
-        "Opmerkingen", 
-        "Items", 
+        "Naam",
+        "Email",
+        "Telefoon",
+        "Ophaalmoment",
+        "Transport",
+        "Opmerkingen",
+        "Items",
         "Totaal",
         "Status"
       ]);
       // Maak header vet
       ordersSheet.getRange(1, 1, 1, 12).setFontWeight("bold");
     }
-    
+
     // Genereer order ID
     const orderId = "ORD-" + Date.now();
     const now = new Date();
-    
+
     // Voeg bestelling toe
+    // Items format: "2x Dumbell 20kg, 1x Kettlebell 16kg"
     ordersSheet.appendRow([
       orderId,
       now.toLocaleDateString('nl-NL'),
@@ -145,21 +258,11 @@ function doPost(e) {
       "€" + data.total,
       "Nieuw"
     ]);
-    
-    // Update inventaris (verminder voorraad)
-    const invSheet = ss.getSheetByName(INVENTORY_SHEET);
-    const invData = invSheet.getDataRange().getValues();
-    const headers = invData[0];
-    const qtyCol = headers.indexOf("Aantal");
-    
-    data.items.forEach(item => {
-      if (item.rowIndex) {
-        const currentQty = invSheet.getRange(item.rowIndex, qtyCol + 1).getValue();
-        const newQty = Math.max(0, currentQty - item.quantity);
-        invSheet.getRange(item.rowIndex, qtyCol + 1).setValue(newQty);
-      }
-    });
-    
+
+    // GEEN voorraad update meer hier!
+    // De voorraad wordt nu berekend op basis van Origineel - alle bestellingen
+    // Als je een bestelling verwijdert, gaat de voorraad automatisch omhoog
+
     // Stuur email notificatie (optioneel - pas email aan)
     try {
       const emailBody = `
@@ -181,29 +284,40 @@ ${data.items.map(i => `- ${i.quantity}x ${i.name}${i.weight ? ' ' + i.weight : '
 
 Totaal: €${data.total}
       `;
-      
+
       // Uncomment de volgende regel en vul je email in om notificaties te ontvangen:
       // MailApp.sendEmail("jouw@email.com", "Nieuwe bestelling: " + orderId, emailBody);
-      
+
     } catch (emailError) {
       // Email fout negeren, bestelling is al opgeslagen
     }
-    
+
     return ContentService
-      .createTextOutput(JSON.stringify({ 
-        success: true, 
-        orderId: orderId 
+      .createTextOutput(JSON.stringify({
+        success: true,
+        orderId: orderId
       }))
       .setMimeType(ContentService.MimeType.JSON);
-      
+
   } catch (error) {
     return ContentService
-      .createTextOutput(JSON.stringify({ 
-        success: false, 
-        error: error.message 
+      .createTextOutput(JSON.stringify({
+        success: false,
+        error: error.message
       }))
       .setMimeType(ContentService.MimeType.JSON);
   }
+}
+
+// Helper: vind kolom index (case-insensitive)
+function findColumn(headers, name) {
+  const searchName = name.toLowerCase().trim();
+  for (let c = 0; c < headers.length; c++) {
+    if (String(headers[c]).toLowerCase().trim() === searchName) {
+      return c;
+    }
+  }
+  return -1;
 }
 
 // Helper functies
@@ -226,19 +340,18 @@ function cleanName(materiaal) {
 
 function getCategory(materiaal) {
   const name = String(materiaal).toLowerCase();
-  
+
   if (name.includes('dumbel')) return 'Dumbells';
   if (name.includes('kettlebell')) return 'Kettlebells';
   if (name.includes('bumper')) return 'Bumper Plates';
   if (name.includes('rower') || name.includes('bike') || name.includes('ski erg')) return 'Cardio';
   if (name.includes('barbell') || name.includes('bar') || name.includes('j-hook')) return 'Barbells & Bars';
-  
+
   return 'Overige Apparatuur';
 }
 
 function formatPickup(pickup) {
   const pickupMap = {
-    'za-27': 'Za 27 dec (13:00-16:00)',
     'zo-28': 'Zo 28 dec (13:00-17:00)',
     'ma-29': 'Ma 29 dec (06:00-21:00)',
     'di-30': 'Di 30 dec (06:00-21:00)',
@@ -261,5 +374,33 @@ function testInventory() {
   const result = doGet({});
   const data = JSON.parse(result.getContent());
   Logger.log("Inventory items: " + data.inventory.length);
-  Logger.log(JSON.stringify(data.inventory.slice(0, 5), null, 2));
+  if (data.inventory.length > 0) {
+    Logger.log("Eerste 3 items:");
+    data.inventory.slice(0, 3).forEach(item => {
+      Logger.log(`- ${item.name} ${item.weight || ''}: ${item.quantity} beschikbaar (origineel: ${item.originalQuantity}, besteld: ${item.orderedQuantity})`);
+    });
+  }
+}
+
+// Test functie - check kolom headers
+function testColumns() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(INVENTORY_SHEET);
+  const headers = sheet.getRange(1, 1, 1, 10).getValues()[0];
+  Logger.log("Headers: " + JSON.stringify(headers));
+
+  const origCol = findColumn(headers, "Origineel");
+  if (origCol >= 0) {
+    Logger.log(">>> ORIGINEEL kolom gevonden op index " + origCol + " (kolom " + (origCol+1) + ")");
+  } else {
+    Logger.log("!!! ORIGINEEL kolom NIET gevonden - voeg deze toe!");
+  }
+}
+
+// Test functie - bekijk bestelde aantallen per item
+function testOrderedQuantities() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const quantities = getOrderedQuantitiesByRow(ss);
+  Logger.log("Bestelde aantallen per rij:");
+  Logger.log(JSON.stringify(quantities, null, 2));
 }

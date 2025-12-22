@@ -385,7 +385,7 @@
         // ============================================
         
         function getCountdown() {
-            const target = new Date('2025-12-27T13:00:00');
+            const target = new Date('2025-12-28T13:00:00');
             const now = new Date();
             const diff = target - now;
 
@@ -424,6 +424,7 @@
             const isLowStock = product.quantity > 0 && product.quantity < 3;
             const isSoldOut = product.quantity <= 0;
             const displayName = product.weight ? `${product.name} ${product.weight}` : product.name;
+            const isTuesdayOnly = product.category === 'Barbells & Bars' || product.category === 'Bumper Plates';
             
             return `
                 <div class="bg-neutral-900 rounded-2xl p-5 border border-neutral-800 card-hover transition-all duration-300 relative ${isSoldOut ? 'sold-out' : ''}">
@@ -481,6 +482,15 @@
                             <div class="flex justify-between items-center text-sm">
                                 <span class="text-green-400">✓ In winkelwagen</span>
                                 <span class="text-neutral-400">${cartQty}x = €${cartQty * product.price}</span>
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    ${isTuesdayOnly ? `
+                        <div class="mt-3 pt-3 border-t border-neutral-800">
+                            <div class="flex items-center gap-2 text-xs text-yellow-400">
+                                <span>⚠️</span>
+                                <span>Ophalen vanaf dinsdag 30 dec</span>
                             </div>
                         </div>
                     ` : ''}
@@ -554,7 +564,6 @@
                                         <label class="block text-sm font-medium text-neutral-300 mb-2">Gewenst ophaalmoment *</label>
                                         <select name="pickup" required class="w-full bg-neutral-800 border border-neutral-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-orange">
                                             <option value="">Selecteer een moment...</option>
-                                            <option value="za-27">Za 27 dec (13:00 - 16:00)</option>
                                             <option value="zo-28">Zo 28 dec (13:00 - 17:00)</option>
                                             <option value="ma-29">Ma 29 dec (06:00 - 21:00)</option>
                                             <option value="di-30">Di 30 dec (06:00 - 21:00)</option>
@@ -764,7 +773,6 @@
                                     📦 Ophaalmomenten
                                 </div>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-left max-w-md mx-auto text-sm md:text-base">
-                                    <div class="text-neutral-300">Za 27 dec</div><div class="text-white font-semibold">13:00 - 16:00</div>
                                     <div class="text-neutral-300">Zo 28 dec</div><div class="text-white font-semibold">13:00 - 17:00</div>
                                     <div class="text-neutral-300">Ma 29 dec</div><div class="text-white font-semibold">06:00 - 21:00</div>
                                     <div class="text-neutral-300">Di 30 dec</div><div class="text-white font-semibold">06:00 - 21:00</div>

@@ -352,10 +352,32 @@ function getCategory(materiaal) {
 
 function formatPickup(pickup) {
   const pickupMap = {
-    'zo-28': 'Zo 28 dec (13:00-17:00)',
-    'ma-29': 'Ma 29 dec (10:00-11:00 of 13:00-17:00)',
-    'di-30': 'Di 30 dec (13:00-21:00)',
-    'wo-31': 'Wo 31 dec (09:00-14:00)'
+    // Zondag 28 dec
+    'zo-28-13': 'Zo 28 dec 13:00-14:00',
+    'zo-28-14': 'Zo 28 dec 14:00-15:00',
+    'zo-28-15': 'Zo 28 dec 15:00-16:00',
+    'zo-28-16': 'Zo 28 dec 16:00-17:00',
+    // Maandag 29 dec
+    'ma-29-10': 'Ma 29 dec 10:00-11:00',
+    'ma-29-13': 'Ma 29 dec 13:00-14:00',
+    'ma-29-14': 'Ma 29 dec 14:00-15:00',
+    'ma-29-15': 'Ma 29 dec 15:00-16:00',
+    'ma-29-16': 'Ma 29 dec 16:00-17:00',
+    // Dinsdag 30 dec
+    'di-30-13': 'Di 30 dec 13:00-14:00',
+    'di-30-14': 'Di 30 dec 14:00-15:00',
+    'di-30-15': 'Di 30 dec 15:00-16:00',
+    'di-30-16': 'Di 30 dec 16:00-17:00',
+    'di-30-17': 'Di 30 dec 17:00-18:00',
+    'di-30-18': 'Di 30 dec 18:00-19:00',
+    'di-30-19': 'Di 30 dec 19:00-20:00',
+    'di-30-20': 'Di 30 dec 20:00-21:00',
+    // Woensdag 31 dec
+    'wo-31-09': 'Wo 31 dec 09:00-10:00',
+    'wo-31-10': 'Wo 31 dec 10:00-11:00',
+    'wo-31-11': 'Wo 31 dec 11:00-12:00',
+    'wo-31-12': 'Wo 31 dec 12:00-13:00',
+    'wo-31-13': 'Wo 31 dec 13:00-14:00'
   };
   return pickupMap[pickup] || pickup;
 }

@@ -353,9 +353,9 @@ function getCategory(materiaal) {
 function formatPickup(pickup) {
   const pickupMap = {
     'zo-28': 'Zo 28 dec (13:00-17:00)',
-    'ma-29': 'Ma 29 dec (06:00-21:00)',
-    'di-30': 'Di 30 dec (06:00-21:00)',
-    'wo-31': 'Wo 31 dec (08:00-13:00)'
+    'ma-29': 'Ma 29 dec (10:00-11:00 of 13:00-17:00)',
+    'di-30': 'Di 30 dec (13:00-21:00)',
+    'wo-31': 'Wo 31 dec (09:00-14:00)'
   };
   return pickupMap[pickup] || pickup;
 }

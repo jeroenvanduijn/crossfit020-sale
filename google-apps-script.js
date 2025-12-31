@@ -426,3 +426,169 @@ function testOrderedQuantities() {
   Logger.log("Bestelde aantallen per rij:");
   Logger.log(JSON.stringify(quantities, null, 2));
 }
+
+// ============================================
+// VOORRAAD OVERZICHT - Run deze functie om het overzicht te maken/updaten
+// ============================================
+function updateVoorraadOverzicht() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const OVERZICHT_SHEET = "Voorraad Overzicht";
+
+  // Maak of haal het overzicht tabblad
+  let overzichtSheet = ss.getSheetByName(OVERZICHT_SHEET);
+  if (!overzichtSheet) {
+    overzichtSheet = ss.insertSheet(OVERZICHT_SHEET);
+  }
+
+  // Haal inventaris data
+  const invSheet = ss.getSheetByName(INVENTORY_SHEET);
+  const invData = invSheet.getDataRange().getValues();
+  const invHeaders = invData[0];
+
+  Logger.log("Headers gevonden: " + JSON.stringify(invHeaders));
+
+  const matCol = findColumn(invHeaders, "Materiaal");
+  const weightCol = findColumn(invHeaders, "Gewicht");
+  const qtyCol = findColumn(invHeaders, "Aantal");
+  const priceCol = findColumn(invHeaders, "2de hands prijs");
+  const origCol = findColumn(invHeaders, "Origineel");
+
+  Logger.log("Kolom indices - Materiaal:" + matCol + " Gewicht:" + weightCol + " Aantal:" + qtyCol + " Prijs:" + priceCol + " Origineel:" + origCol);
+
+  // Haal bestelde aantallen
+  const orderedQuantities = getOrderedQuantitiesByRow(ss);
+
+  // Bouw overzicht data
+  const overzichtData = [
+    ["Materiaal", "Gewicht", "Prijs", "Origineel", "Gereserveerd", "Beschikbaar", "Status", "Laatste update"]
+  ];
+
+  let totaalOrigineel = 0;
+  let totaalGereserveerd = 0;
+  let totaalBeschikbaar = 0;
+  let totaalWaardeOrigineel = 0;
+  let totaalWaardeBeschikbaar = 0;
+
+  for (let i = 1; i < invData.length; i++) {
+    const row = invData[i];
+    const materiaal = row[matCol];
+    const gewicht = row[weightCol];
+    const prijs = priceCol >= 0 ? row[priceCol] : 0;
+
+    // Gebruik Origineel kolom als die bestaat, anders Aantal
+    let origineel;
+    if (origCol >= 0 && row[origCol] !== null && row[origCol] !== "" && !isNaN(row[origCol])) {
+      origineel = row[origCol];
+    } else if (qtyCol >= 0) {
+      origineel = row[qtyCol];
+    } else {
+      continue;
+    }
+
+    // Skip lege/ongeldige rijen
+    if (!materiaal ||
+        String(materiaal).toLowerCase().includes("totaal") ||
+        origineel === null ||
+        origineel === "" ||
+        isNaN(origineel)) {
+      continue;
+    }
+
+    // Skip als prijs niet bestaat of ongeldig is
+    if (prijs === null || prijs === "" || isNaN(prijs)) {
+      continue;
+    }
+
+    const rowIndex = i + 1;
+    const origineelAantal = parseInt(origineel) || 0;
+    const gereserveerd = orderedQuantities[rowIndex] || 0;
+    const beschikbaar = Math.max(0, origineelAantal - gereserveerd);
+
+    let status = "Beschikbaar";
+    if (beschikbaar === 0) {
+      status = "UITVERKOCHT";
+    } else if (beschikbaar < 3) {
+      status = "Bijna op";
+    }
+
+    overzichtData.push([
+      materiaal,
+      gewicht && !isNaN(gewicht) ? gewicht + "kg" : (gewicht || ""),
+      "€" + prijs,
+      origineelAantal,
+      gereserveerd,
+      beschikbaar,
+      status,
+      new Date().toLocaleString('nl-NL')
+    ]);
+
+    totaalOrigineel += origineelAantal;
+    totaalGereserveerd += gereserveerd;
+    totaalBeschikbaar += beschikbaar;
+    totaalWaardeOrigineel += origineelAantal * parseFloat(prijs);
+    totaalWaardeBeschikbaar += beschikbaar * parseFloat(prijs);
+  }
+
+  Logger.log("Aantal items gevonden: " + (overzichtData.length - 1));
+
+  // Als er geen items zijn, geef foutmelding
+  if (overzichtData.length === 1) {
+    overzichtData.push(["Geen items gevonden!", "Check of Sheet1 data bevat", "", "", "", "", "", ""]);
+  }
+
+  // Voeg totaalrij toe
+  overzichtData.push(["", "", "", "", "", "", "", ""]);
+  overzichtData.push([
+    "TOTAAL",
+    "",
+    "",
+    totaalOrigineel,
+    totaalGereserveerd,
+    totaalBeschikbaar,
+    totaalOrigineel > 0 ? Math.round(totaalGereserveerd / totaalOrigineel * 100) + "% verkocht" : "0%",
+    ""
+  ]);
+  overzichtData.push([
+    "WAARDE",
+    "",
+    "",
+    "€" + Math.round(totaalWaardeOrigineel),
+    "€" + Math.round(totaalWaardeOrigineel - totaalWaardeBeschikbaar),
+    "€" + Math.round(totaalWaardeBeschikbaar),
+    "",
+    ""
+  ]);
+
+  // Wis bestaande data en schrijf nieuwe
+  overzichtSheet.clear();
+  overzichtSheet.getRange(1, 1, overzichtData.length, 8).setValues(overzichtData);
+
+  // Opmaak
+  overzichtSheet.getRange(1, 1, 1, 8).setFontWeight("bold").setBackground("#f3f3f3");
+  overzichtSheet.setFrozenRows(1);
+
+  // Kolom breedtes
+  overzichtSheet.setColumnWidth(1, 200);
+  overzichtSheet.setColumnWidth(2, 80);
+  overzichtSheet.setColumnWidth(3, 80);
+  overzichtSheet.setColumnWidth(4, 80);
+  overzichtSheet.setColumnWidth(5, 100);
+  overzichtSheet.setColumnWidth(6, 100);
+  overzichtSheet.setColumnWidth(7, 100);
+  overzichtSheet.setColumnWidth(8, 150);
+
+  // Markeer uitverkochte items rood
+  for (let i = 2; i <= overzichtData.length; i++) {
+    if (overzichtData[i-1] && overzichtData[i-1][6] === "UITVERKOCHT") {
+      overzichtSheet.getRange(i, 1, 1, 8).setBackground("#ffcccc");
+    } else if (overzichtData[i-1] && overzichtData[i-1][6] === "Bijna op") {
+      overzichtSheet.getRange(i, 1, 1, 8).setBackground("#fff3cd");
+    }
+  }
+
+  // Totaal rijen vet
+  overzichtSheet.getRange(overzichtData.length - 1, 1, 2, 8).setFontWeight("bold").setBackground("#e8e8e8");
+
+  Logger.log("Voorraad Overzicht bijgewerkt!");
+  Logger.log("Totaal: " + totaalOrigineel + " items, " + totaalGereserveerd + " gereserveerd, " + totaalBeschikbaar + " beschikbaar");
+}

@@ -424,7 +424,6 @@
             const isLowStock = product.quantity > 0 && product.quantity < 3;
             const isSoldOut = product.quantity <= 0;
             const displayName = product.weight ? `${product.name} ${product.weight}` : product.name;
-            const isTuesdayOnly = product.category === 'Barbells & Bars' || product.category === 'Bumper Plates';
             
             return `
                 <div class="bg-neutral-900 rounded-2xl p-5 border border-neutral-800 card-hover transition-all duration-300 relative ${isSoldOut ? 'sold-out' : ''}">
@@ -486,14 +485,6 @@
                         </div>
                     ` : ''}
 
-                    ${isTuesdayOnly ? `
-                        <div class="mt-3 pt-3 border-t border-neutral-800">
-                            <div class="flex items-center gap-2 text-xs text-yellow-400">
-                                <span>⚠️</span>
-                                <span>Ophalen vanaf dinsdag 30 dec</span>
-                            </div>
-                        </div>
-                    ` : ''}
                 </div>
             `;
         }
@@ -561,39 +552,12 @@
                                         <input type="tel" name="phone" required class="w-full bg-neutral-800 border border-neutral-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-orange">
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium text-neutral-300 mb-2">Gewenst ophaalmoment *</label>
+                                        <label class="block text-sm font-medium text-neutral-300 mb-2">Voorkeur ophaaldagen *</label>
                                         <select name="pickup" required class="w-full bg-neutral-800 border border-neutral-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-orange">
-                                            <option value="">Selecteer een moment...</option>
-                                            <optgroup label="Zondag 28 december">
-                                                <option value="zo-28-13">Zo 28 dec - 13:00 tot 14:00</option>
-                                                <option value="zo-28-14">Zo 28 dec - 14:00 tot 15:00</option>
-                                                <option value="zo-28-15">Zo 28 dec - 15:00 tot 16:00</option>
-                                                <option value="zo-28-16">Zo 28 dec - 16:00 tot 17:00</option>
-                                            </optgroup>
-                                            <optgroup label="Maandag 29 december">
-                                                <option value="ma-29-10">Ma 29 dec - 10:00 tot 11:00</option>
-                                                <option value="ma-29-13">Ma 29 dec - 13:00 tot 14:00</option>
-                                                <option value="ma-29-14">Ma 29 dec - 14:00 tot 15:00</option>
-                                                <option value="ma-29-15">Ma 29 dec - 15:00 tot 16:00</option>
-                                                <option value="ma-29-16">Ma 29 dec - 16:00 tot 17:00</option>
-                                            </optgroup>
-                                            <optgroup label="Dinsdag 30 december">
-                                                <option value="di-30-13">Di 30 dec - 13:00 tot 14:00</option>
-                                                <option value="di-30-14">Di 30 dec - 14:00 tot 15:00</option>
-                                                <option value="di-30-15">Di 30 dec - 15:00 tot 16:00</option>
-                                                <option value="di-30-16">Di 30 dec - 16:00 tot 17:00</option>
-                                                <option value="di-30-17">Di 30 dec - 17:00 tot 18:00</option>
-                                                <option value="di-30-18">Di 30 dec - 18:00 tot 19:00</option>
-                                                <option value="di-30-19">Di 30 dec - 19:00 tot 20:00</option>
-                                                <option value="di-30-20">Di 30 dec - 20:00 tot 21:00</option>
-                                            </optgroup>
-                                            <optgroup label="Woensdag 31 december">
-                                                <option value="wo-31-09">Wo 31 dec - 09:00 tot 10:00</option>
-                                                <option value="wo-31-10">Wo 31 dec - 10:00 tot 11:00</option>
-                                                <option value="wo-31-11">Wo 31 dec - 11:00 tot 12:00</option>
-                                                <option value="wo-31-12">Wo 31 dec - 12:00 tot 13:00</option>
-                                                <option value="wo-31-13">Wo 31 dec - 13:00 tot 14:00</option>
-                                            </optgroup>
+                                            <option value="">Selecteer je voorkeur...</option>
+                                            <option value="dinsdagen">Dinsdagen</option>
+                                            <option value="donderdagen">Donderdagen</option>
+                                            <option value="vrijdagen">Vrijdagen</option>
                                         </select>
                                     </div>
                                     <div>
@@ -807,24 +771,6 @@
                                 </p>
                             </div>
 
-                            <div class="bg-brand-orange/15 border border-brand-orange/40 rounded-2xl p-6 mb-10">
-                                <div class="text-brand-orange font-bold text-lg md:text-xl mb-2">
-                                    Ophaalmomenten
-                                </div>
-                                <p class="text-neutral-500 text-xs mb-4">Dankjewel dat je helpt dit netjes af te ronden.</p>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-left max-w-md mx-auto text-sm md:text-base">
-                                    <div class="text-neutral-400">Zo 28 dec</div><div class="text-white font-medium">13:00 - 17:00</div>
-                                    <div class="text-neutral-400">Ma 29 dec</div><div class="text-white font-medium">10:00 - 11:00, 13:00 - 17:00</div>
-                                    <div class="text-neutral-400">Di 30 dec</div><div class="text-white font-medium">13:00 - 21:00</div>
-                                    <div class="text-neutral-400">Wo 31 dec</div><div class="text-white font-medium">09:00 - 14:00</div>
-                                </div>
-                                <div class="text-neutral-500 mt-4 text-sm">Hoogoorddreef 3, Amsterdam Zuidoost</div>
-                            </div>
-
-                            <div class="mb-10">
-                                <p class="text-neutral-500 mb-4 text-sm font-medium">Eerste ophaalmoment start over:</p>
-                                <div id="countdown">${renderCountdown()}</div>
-                            </div>
 
                             <div class="flex justify-center gap-6 md:gap-10">
                                 <div class="text-center">

@@ -31,7 +31,6 @@
         .card-hover:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(255, 107, 53, 0.15); }
         .pulse-badge { animation: pulse 2s infinite; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
-        .countdown-box { background: linear-gradient(180deg, #FF6B35 0%, #e55a2b 100%); }
         .cart-bounce { animation: bounce 0.3s ease; }
         @keyframes bounce { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.2); } }
         .stock-bar { transition: width 0.3s ease; }
@@ -381,39 +380,6 @@
         }
 
         // ============================================
-        // COUNTDOWN
-        // ============================================
-        
-        function getCountdown() {
-            const target = new Date('2025-12-28T13:00:00');
-            const now = new Date();
-            const diff = target - now;
-
-            if (diff <= 0) return { days: 0, hours: 0, minutes: 0, seconds: 0 };
-
-            return {
-                days: Math.floor(diff / (1000 * 60 * 60 * 24)),
-                hours: Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-                minutes: Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)),
-                seconds: Math.floor((diff % (1000 * 60)) / 1000),
-            };
-        }
-
-        function renderCountdown() {
-            const cd = getCountdown();
-            return `
-                <div class="flex gap-3 md:gap-4 justify-center">
-                    ${['dagen', 'uren', 'min', 'sec'].map((label, i) => `
-                        <div class="countdown-box rounded-xl p-3 md:p-4 min-w-[70px] md:min-w-[80px] text-center shadow-lg">
-                            <div class="text-2xl md:text-4xl font-black">${[cd.days, cd.hours, cd.minutes, cd.seconds][i]}</div>
-                            <div class="text-xs md:text-sm font-medium opacity-90">${label}</div>
-                        </div>
-                    `).join('')}
-                </div>
-            `;
-        }
-
-        // ============================================
         // RENDER FUNCTIONS
         // ============================================
 
@@ -561,39 +527,14 @@
                                         <input type="tel" name="phone" required class="w-full bg-neutral-800 border border-neutral-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-orange">
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-medium text-neutral-300 mb-2">Gewenst ophaalmoment *</label>
+                                        <label class="block text-sm font-medium text-neutral-300 mb-2">Wanneer kun je ophalen? *</label>
                                         <select name="pickup" required class="w-full bg-neutral-800 border border-neutral-700 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-brand-orange">
                                             <option value="">Selecteer een moment...</option>
-                                            <optgroup label="Zondag 28 december">
-                                                <option value="zo-28-13">Zo 28 dec - 13:00 tot 14:00</option>
-                                                <option value="zo-28-14">Zo 28 dec - 14:00 tot 15:00</option>
-                                                <option value="zo-28-15">Zo 28 dec - 15:00 tot 16:00</option>
-                                                <option value="zo-28-16">Zo 28 dec - 16:00 tot 17:00</option>
-                                            </optgroup>
-                                            <optgroup label="Maandag 29 december">
-                                                <option value="ma-29-10">Ma 29 dec - 10:00 tot 11:00</option>
-                                                <option value="ma-29-13">Ma 29 dec - 13:00 tot 14:00</option>
-                                                <option value="ma-29-14">Ma 29 dec - 14:00 tot 15:00</option>
-                                                <option value="ma-29-15">Ma 29 dec - 15:00 tot 16:00</option>
-                                                <option value="ma-29-16">Ma 29 dec - 16:00 tot 17:00</option>
-                                            </optgroup>
-                                            <optgroup label="Dinsdag 30 december">
-                                                <option value="di-30-13">Di 30 dec - 13:00 tot 14:00</option>
-                                                <option value="di-30-14">Di 30 dec - 14:00 tot 15:00</option>
-                                                <option value="di-30-15">Di 30 dec - 15:00 tot 16:00</option>
-                                                <option value="di-30-16">Di 30 dec - 16:00 tot 17:00</option>
-                                                <option value="di-30-17">Di 30 dec - 17:00 tot 18:00</option>
-                                                <option value="di-30-18">Di 30 dec - 18:00 tot 19:00</option>
-                                                <option value="di-30-19">Di 30 dec - 19:00 tot 20:00</option>
-                                                <option value="di-30-20">Di 30 dec - 20:00 tot 21:00</option>
-                                            </optgroup>
-                                            <optgroup label="Woensdag 31 december">
-                                                <option value="wo-31-09">Wo 31 dec - 09:00 tot 10:00</option>
-                                                <option value="wo-31-10">Wo 31 dec - 10:00 tot 11:00</option>
-                                                <option value="wo-31-11">Wo 31 dec - 11:00 tot 12:00</option>
-                                                <option value="wo-31-12">Wo 31 dec - 12:00 tot 13:00</option>
-                                                <option value="wo-31-13">Wo 31 dec - 13:00 tot 14:00</option>
-                                            </optgroup>
+                                            <option value="di-ochtend">Dinsdag ochtend</option>
+                                            <option value="di-middag">Dinsdag middag</option>
+                                            <option value="do-ochtend">Donderdag ochtend</option>
+                                            <option value="vr-middag">Vrijdag middag</option>
+                                            <option value="za-ochtend">Zaterdag ochtend</option>
                                         </select>
                                     </div>
                                     <div>
@@ -796,27 +737,8 @@
                                 Apparatuur die jarenlang onderdeel was van onze community, krijgt nu een nieuw thuis.
                             </p>
                             <p class="text-sm text-neutral-500 mb-10">
-                                Om alles netjes en op tijd af te ronden, werken we met vaste ophaalmomenten en reserveringen.
+                                Ophalen bij CrossFit Leiden - je ontvangt de exacte locatie na bevestiging via mail.
                             </p>
-
-                            <div class="bg-brand-orange/15 border border-brand-orange/40 rounded-2xl p-6 mb-10">
-                                <div class="text-brand-orange font-bold text-lg md:text-xl mb-2">
-                                    Ophaalmomenten
-                                </div>
-                                <p class="text-neutral-500 text-xs mb-4">Dankjewel dat je helpt dit netjes af te ronden.</p>
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-left max-w-md mx-auto text-sm md:text-base">
-                                    <div class="text-neutral-400">Zo 28 dec</div><div class="text-white font-medium">13:00 - 17:00</div>
-                                    <div class="text-neutral-400">Ma 29 dec</div><div class="text-white font-medium">10:00 - 11:00, 13:00 - 17:00</div>
-                                    <div class="text-neutral-400">Di 30 dec</div><div class="text-white font-medium">13:00 - 21:00</div>
-                                    <div class="text-neutral-400">Wo 31 dec</div><div class="text-white font-medium">09:00 - 14:00</div>
-                                </div>
-                                <div class="text-neutral-500 mt-4 text-sm">Hoogoorddreef 3, Amsterdam Zuidoost</div>
-                            </div>
-
-                            <div class="mb-10">
-                                <p class="text-neutral-500 mb-4 text-sm font-medium">Eerste ophaalmoment start over:</p>
-                                <div id="countdown">${renderCountdown()}</div>
-                            </div>
 
                             <div class="flex justify-center gap-6 md:gap-10">
                                 <div class="text-center">
@@ -825,12 +747,7 @@
                                     <div class="text-neutral-600 text-xs mt-1">Uit onze box</div>
                                 </div>
                                 <div class="text-center">
-                                    <div class="text-3xl md:text-4xl font-black text-brand-orange">${originalItems - totalItems}</div>
-                                    <div class="text-neutral-400 text-sm">Al gereserveerd</div>
-                                    <div class="text-neutral-600 text-xs mt-1">Hebben al een nieuwe plek</div>
-                                </div>
-                                <div class="text-center">
-                                    <div class="text-3xl md:text-4xl font-black text-white">€${Math.round(originalValue / 1000)}k</div>
+                                    <div class="text-3xl md:text-4xl font-black text-white">€${Math.round(totalValue / 1000)}k</div>
                                     <div class="text-neutral-400 text-sm">Totale waarde</div>
                                     <div class="text-neutral-600 text-xs mt-1">Ter indicatie</div>
                                 </div>
@@ -1080,12 +997,6 @@
 
         // Initialize
         loadInventory();
-
-        // Update countdown every second
-        setInterval(() => {
-            const countdownEl = document.getElementById('countdown');
-            if (countdownEl) countdownEl.innerHTML = renderCountdown();
-        }, 1000);
     </script>
 </body>
 </html>

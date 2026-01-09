@@ -22,6 +22,7 @@
 
 const INVENTORY_SHEET = "Sheet1";  // Naam van je inventaris tabblad
 const ORDERS_SHEET = "Bestellingen";  // Tabblad voor bestellingen
+const ZAPIER_WEBHOOK_URL = "https://hooks.zapier.com/hooks/catch/2231753/uafctk7/";
 
 // GET request - Inventaris ophalen
 function doGet(e) {
@@ -262,6 +263,42 @@ function doPost(e) {
     // GEEN voorraad update meer hier!
     // De voorraad wordt nu berekend op basis van Origineel - alle bestellingen
     // Als je een bestelling verwijdert, gaat de voorraad automatisch omhoog
+
+    // Stuur bestelgegevens naar Zapier webhook
+    try {
+      const webhookPayload = {
+        orderId: orderId,
+        datum: now.toLocaleDateString('nl-NL'),
+        tijd: now.toLocaleTimeString('nl-NL'),
+        klant: {
+          naam: data.customer.name,
+          email: data.customer.email,
+          telefoon: data.customer.phone,
+          ophaalmoment: formatPickup(data.customer.pickup),
+          transport: formatTransport(data.customer.transport),
+          opmerkingen: data.customer.notes || ""
+        },
+        items: data.items.map(i => ({
+          naam: i.name,
+          gewicht: i.weight || null,
+          aantal: i.quantity,
+          prijsPerStuk: i.price,
+          totaalPrijs: i.quantity * i.price
+        })),
+        totaal: data.total,
+        itemsText: data.items.map(i => `${i.quantity}x ${i.name}${i.weight ? ' ' + i.weight : ''}`).join(", ")
+      };
+
+      UrlFetchApp.fetch(ZAPIER_WEBHOOK_URL, {
+        method: 'POST',
+        contentType: 'application/json',
+        payload: JSON.stringify(webhookPayload),
+        muteHttpExceptions: true
+      });
+    } catch (webhookError) {
+      // Webhook fout negeren, bestelling is al opgeslagen
+      Logger.log("Webhook error: " + webhookError.message);
+    }
 
     // Stuur email notificatie (optioneel - pas email aan)
     try {

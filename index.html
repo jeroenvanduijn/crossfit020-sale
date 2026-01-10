@@ -534,6 +534,135 @@ Contact: info@crossfit020.nl`;
             });
         }
 
+        // Groepsadvertentie generator
+        function openGroupMarktplaatsModal(category) {
+            const categoryNames = {
+                'Dumbells': 'Dumbells',
+                'Kettlebells': 'Kettlebells',
+                'Bumper Plates': 'Bumper Plates'
+            };
+
+            const categoryName = categoryNames[category] || category;
+
+            // Filter producten op categorie met voorraad en marktplaats prijs
+            const products = state.inventory.filter(p =>
+                p.category === category &&
+                p.quantity > 0 &&
+                p.marktplaatsPrice
+            ).sort((a, b) => {
+                // Sorteer op gewicht (numeriek)
+                const weightA = parseFloat(a.weight) || 0;
+                const weightB = parseFloat(b.weight) || 0;
+                return weightA - weightB;
+            });
+
+            if (products.length === 0) {
+                alert('Geen producten gevonden met Marktplaats prijs in deze categorie.');
+                return;
+            }
+
+            // Bereken totalen
+            let totalItems = 0;
+            let totalValue = 0;
+            products.forEach(p => {
+                totalItems += p.quantity;
+                totalValue += p.quantity * p.marktplaatsPrice;
+            });
+
+            // Genereer prijslijst
+            const priceList = products.map(p => {
+                const displayName = p.weight ? `${p.weight}` : p.name;
+                return `• ${displayName}: €${p.marktplaatsPrice} per stuk (${p.quantity}x beschikbaar)`;
+            }).join('\n');
+
+            // Genereer advertentie tekst
+            const title = `${categoryName} set - CrossFit kwaliteit - Meerdere gewichten`;
+            const description = `Complete set professionele ${categoryName.toLowerCase()} van CrossFit 020 Amsterdam!
+
+Ideaal voor (thuis)gym, sportschool of CrossFit box.
+
+📦 BESCHIKBAAR:
+${priceList}
+
+💰 TOTAAL: ${totalItems} stuks beschikbaar
+📍 Ophalen: Leiden (exacte locatie na afspraak)
+💵 Betaling: Contant bij ophalen
+
+✅ Bij afname van meerdere stuks: korting mogelijk!
+✅ Professionele CrossFit kwaliteit
+✅ Gebruikt maar goed onderhouden
+
+Interesse in de complete set of een selectie? Stuur een bericht!
+
+Contact: info@crossfit020.nl`;
+
+            // Modal HTML
+            const modalHtml = `
+                <div id="marktplaats-modal" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4" onclick="closeMarktplaatsModal(event)">
+                    <div class="bg-neutral-900 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+                        <div class="p-6 border-b border-neutral-800">
+                            <div class="flex justify-between items-center">
+                                <h2 class="text-xl font-bold text-white">Groepsadvertentie: ${categoryName}</h2>
+                                <button onclick="closeMarktplaatsModal()" class="text-neutral-400 hover:text-white text-2xl">&times;</button>
+                            </div>
+                            <p class="text-neutral-400 text-sm mt-1">${totalItems} items - Totale waarde €${totalValue}</p>
+                        </div>
+
+                        <div class="p-6 space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-neutral-300 mb-2">Titel</label>
+                                <div class="flex gap-2">
+                                    <input type="text" id="mp-title" value="${title}"
+                                           class="flex-1 bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-white">
+                                    <button onclick="copyField('mp-title')" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm">Kopieer</button>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-neutral-300 mb-2">Beschrijving</label>
+                                <div class="flex gap-2">
+                                    <textarea id="mp-description" rows="16"
+                                              class="flex-1 bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-white text-sm">${description}</textarea>
+                                    <button onclick="copyField('mp-description')" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm h-fit">Kopieer</button>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-neutral-300 mb-2">Vraagprijs (suggestie)</label>
+                                    <div class="flex gap-2">
+                                        <input type="text" id="mp-price" value="Zie beschrijving"
+                                               class="flex-1 bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-white">
+                                        <button onclick="copyField('mp-price')" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm">Kopieer</button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-neutral-300 mb-2">Categorie</label>
+                                    <div class="flex gap-2">
+                                        <input type="text" id="mp-category" value="Sport en Fitness > Fitness > Gewichten"
+                                               class="flex-1 bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-2 text-white text-sm">
+                                        <button onclick="copyField('mp-category')" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm">Kopieer</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="pt-4 border-t border-neutral-800 flex gap-3">
+                                <button onclick="copyAllFields()" class="flex-1 py-3 bg-green-600 hover:bg-green-700 text-white font-bold rounded-lg transition-colors">
+                                    📋 Kopieer alles
+                                </button>
+                                <a href="https://www.marktplaats.nl/plaats" target="_blank"
+                                   class="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition-colors text-center">
+                                    🔗 Open Marktplaats
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        }
+
         // ============================================
         // RENDER FUNCTIONS
         // ============================================
@@ -936,7 +1065,26 @@ Contact: info@crossfit020.nl`;
                             <h2 class="text-2xl md:text-3xl font-bold mb-4">Beschikbaar materiaal</h2>
                             <p class="text-neutral-400">De voorraad wordt live bijgewerkt. Klik op + om te reserveren.</p>
                         </div>
-                        
+
+                        ${state.isAdmin ? `
+                        <div class="mb-8 p-4 bg-blue-900/30 border border-blue-700 rounded-xl">
+                            <div class="flex items-center gap-2 mb-3">
+                                <span class="text-blue-400 font-bold">🔐 Admin: Groepsadvertenties</span>
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                <button onclick="openGroupMarktplaatsModal('Dumbells')" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors">
+                                    📢 Alle Dumbells
+                                </button>
+                                <button onclick="openGroupMarktplaatsModal('Kettlebells')" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors">
+                                    📢 Alle Kettlebells
+                                </button>
+                                <button onclick="openGroupMarktplaatsModal('Bumper Plates')" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors">
+                                    📢 Alle Bumper Plates
+                                </button>
+                            </div>
+                        </div>
+                        ` : ''}
+
                         <div class="mb-8 space-y-4">
                             <div class="flex flex-col md:flex-row gap-4 justify-between items-center">
                                 <div class="relative w-full md:w-96">
@@ -1162,6 +1310,7 @@ Contact: info@crossfit020.nl`;
         window.closeMarktplaatsModal = closeMarktplaatsModal;
         window.copyField = copyField;
         window.copyAllFields = copyAllFields;
+        window.openGroupMarktplaatsModal = openGroupMarktplaatsModal;
 
         // Initialize
         loadInventory();

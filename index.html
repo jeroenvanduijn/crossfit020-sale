@@ -82,6 +82,10 @@
         // ============================================
 
         // State
+        // Check voor admin mode via URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const isAdmin = urlParams.get('admin') === 'crossfit020';
+
         let state = {
             inventory: [],
             cart: [],
@@ -93,6 +97,7 @@
             checkoutStep: 'cart',
             submitting: false,
             lastOrder: null,
+            isAdmin: isAdmin,
         };
 
         // ============================================
@@ -611,7 +616,7 @@ Contact: info@crossfit020.nl`;
                         </div>
                     ` : ''}
 
-                    ${product.marktplaatsPrice ? `
+                    ${state.isAdmin && product.marktplaatsPrice ? `
                         <div class="mt-3 pt-3 border-t border-neutral-800">
                             <button onclick="openMarktplaatsModal('${product.id}')"
                                     class="w-full py-2 px-3 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors flex items-center justify-center gap-2">

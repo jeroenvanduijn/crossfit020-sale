@@ -39,6 +39,7 @@ function doGet(e) {
     const weightCol = findColumn(headers, "Gewicht");
     const priceCol = findColumn(headers, "2de hands prijs");
     const origCol = findColumn(headers, "Origineel");
+    const mpPriceCol = 9; // Kolom J (0-indexed) = Marktplaats prijs
 
     if (origCol === -1) {
       return ContentService
@@ -60,6 +61,7 @@ function doGet(e) {
       const gewicht = row[weightCol];
       const origineel = row[origCol];
       const prijs = row[priceCol];
+      const mpPrijs = row[mpPriceCol]; // Marktplaats prijs uit kolom J
 
       // Skip lege rijen, totaalrijen, en items zonder originele voorraad of prijs
       if (!materiaal ||
@@ -94,6 +96,7 @@ function doGet(e) {
         originalQuantity: origineelAantal,
         orderedQuantity: besteldAantal,
         price: parseFloat(prijs) || 0,
+        marktplaatsPrice: mpPrijs && !isNaN(mpPrijs) ? parseFloat(mpPrijs) : null,
         category: getCategory(materiaal)
       });
     }
